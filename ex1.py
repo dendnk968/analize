@@ -1,5 +1,7 @@
 import json
 import argparse
+import scipy.stats
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -41,4 +43,21 @@ count_publication_to_count_people = dict()
 
 for it in data:
     count_publication_to_count_people[it['count_publication']] = count_publication_to_count_people.get(it['count_publication'], 0) + 1
-fig, ax = plt.subplots()
+
+count_publication_to_count_people = sorted(count_publication_to_count_people.items())
+
+x = [it[0] for it in count_publication_to_count_people]
+y = [it[1] for it in count_publication_to_count_people]
+
+
+plt.plot(x, y)
+plt.savefig(args.output_dir + "/grafic.png")
+
+count_publication_without_academic_degree = [it["count_publication"] for it in data if it["academic_degree"] == None]
+count_publication_with_academic_degree = [it["count_publication"] for it in data if it["academic_degree"] != None]
+
+arr = [0 for it in count_publication_without_academic_degree]
+arr.extend([1 for it in count_publication_with_academic_degree])
+count_publication_without_academic_degree.extend(count_publication_with_academic_degree)
+
+print(scipy.stats.spearmanr(count_publication_without_academic_degree, arr))
